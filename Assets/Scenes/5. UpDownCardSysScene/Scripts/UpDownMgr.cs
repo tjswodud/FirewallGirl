@@ -281,15 +281,14 @@ public class UpDownMgr : MonoBehaviour
         OnAugmentSelected?.Invoke();
 
         // 튜토리얼 씬에서는 TutorialManager가 씬 전환을 담당
-        if (TutorialManager.instance == null)
-        {
-            StageSaveManager.ClearStage(StageSaveManager.CurrentStageIdx);
-            // 클리어 후 자동 저장 (기존 PlayerPrefs 저장과 동일 시점)
-            PlayerStateSaveManager.instance.Save(
-                PlayerStateSaveManager.instance.BuildSaveData(StageSaveManager.CurrentStageIdx)
-            );
-            SceneManager.LoadScene("StageScene");
-        }
+        if (TutorialManager.instance != null) return;
+
+        // 보스 클리어는 Virus.OnBossDeath 이벤트 → GameManager.HandleBossDeathEvent()로 처리
+        StageSaveManager.ClearStage(StageSaveManager.CurrentStageIdx);
+        PlayerStateSaveManager.instance.Save(
+            PlayerStateSaveManager.instance.BuildSaveData(StageSaveManager.CurrentStageIdx)
+        );
+        SceneManager.LoadScene("StageScene");
     }
 
     // 스프라이트 매칭 

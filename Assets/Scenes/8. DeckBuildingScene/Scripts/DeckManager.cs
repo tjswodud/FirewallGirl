@@ -50,14 +50,14 @@ public class DeckManager : MonoBehaviour
     private void Start()
     {
         List<CardObject> cardsToLoad = new List<CardObject>();
-        
+
         // 1. 카드 데이터 가져오기
         if (CardDatabaseManager.instance != null)
         {
             cardsToLoad = CardDatabaseManager.instance.GetAllCards();
             Debug.Log($"[DeckManager] DB에서 {cardsToLoad.Count}장의 카드를 성공적으로 불러왔습니다.");
         }
-        
+
         foreach (CardObject cardData in cardsToLoad)
         {
             if (cardData == null) continue;
@@ -65,13 +65,11 @@ public class DeckManager : MonoBehaviour
             GameObject cardObj = Instantiate(cardPrefab, collectionContainer);
             cardObj.transform.localScale = Vector3.one * collectionScale;
             PlayerCard playerCard = cardObj.GetComponent<PlayerCard>();
-            
+
             if (playerCard != null)
             {
-                // ✅ [수정] 원본 SO를 그대로 쓰지 않고 복사본(Clone)을 생성하여 할당합니다.
-                // 이렇게 하면 증강체로 값을 바꿔도 원본 파일이 손상되지 않습니다.
                 CardObject clonedData = Instantiate(cardData);
-                clonedData.name = cardData.name; // (Clone) 이름 제거 (선택사항)
+                clonedData.name = cardData.name;
                 playerCard.cardData = clonedData;
                 playerCard.posValue = cardData.positiveStatValue;
                 playerCard.negValue = cardData.negativeStatValue;
@@ -84,12 +82,51 @@ public class DeckManager : MonoBehaviour
                 cardCtrl.SetupForDeckBuilding(this);
                 cardCtrl.SetCollectionState(true);
             }
-            
+
             UpdateCardVisuals(cardObj, cardData);
         }
 
-        // // 2. 카드 생성 및 초기화
-        // InitializeCollection(cardsToLoad);
+        // 챕터 클리어 후 진입 시 현재 덱을 사전 선택 상태로 표시
+        if (ChapterManager.instance.IsChapterTransition)
+        {
+            PreSelectCurrentDeck();
+            ChapterManager.instance.IsChapterTransition = false;
+        }
+    }
+
+    /// <summary>챕터 전환 시 현재 masterDeck의 카드들을 사전 선택 상태로 표시한다.</summary>
+    private void PreSelectCurrentDeck()
+    {
+        List<CardObject> savedDeck = CardDatabaseManager.instance?.GetCurrentDeck();
+        if (savedDeck == null || savedDeck.Count == 0) return;
+
+        // cardIndex 기준 선택 횟수 카운트 (중복 카드 지원)
+        Dictionary<int, int> indexCount = new Dictionary<int, int>();
+        foreach (CardObject card in savedDeck)
+        {
+            if (!indexCount.ContainsKey(card.cardIndex))
+                indexCount[card.cardIndex] = 0;
+            indexCount[card.cardIndex]++;
+        }
+
+        foreach (Transform child in collectionContainer)
+        {
+            if (selectedCards.Count >= maxDeckSize) break;
+            PlayerCard pc = child.GetComponent<PlayerCard>();
+            if (pc == null || pc.cardData == null) continue;
+            int idx = pc.cardData.cardIndex;
+            if (indexCount.TryGetValue(idx, out int cnt) && cnt > 0)
+            {
+                CardController cc = child.GetComponent<CardController>();
+                if (cc != null && !cc.isSelected)
+                {
+                    SelectCard(cc);
+                    indexCount[idx]--;
+                }
+            }
+        }
+
+        Debug.Log($"[DeckManager] 챕터 전환 사전 선택 완료: {selectedCards.Count}장");
     }
     
     void InitializeCollection(List<CardObject> dataList)

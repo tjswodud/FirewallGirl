@@ -13,7 +13,6 @@ public class PlayerStateSaveManager
     public static PlayerStateSaveManager instance => _instance ??= new PlayerStateSaveManager();
 
     private const string SaveFileName = "player_save.json";
-    private const int TotalNormalStages = 6;
 
     private static string SavePath => Application.persistentDataPath + "/" + SaveFileName;
 
@@ -83,16 +82,20 @@ public class PlayerStateSaveManager
         PlayerManager pm = PlayerManager.instance;
         if (pm == null) return null;
 
+        ChapterData currentChapter = ChapterManager.instance.GetCurrentChapter();
+        int totalStages = currentChapter != null ? currentChapter.normalStageCount : 6;
+
         var data = new PlayerSaveData
         {
             currentHP = pm.currentHP,
             fullHP = pm.MaxHP,
             baseStats = pm.GetBaseStats(),
-            resumeStageIndex = resumeStageIndex
+            resumeStageIndex = resumeStageIndex,
+            currentChapterId = ChapterManager.instance.CurrentChapterId
         };
 
         // 클리어된 스테이지 목록 수집 (PlayerPrefs가 이미 갱신된 상태)
-        for (int i = 0; i < TotalNormalStages; i++)
+        for (int i = 0; i < totalStages; i++)
         {
             if (StageSaveManager.IsStageCleared(i))
                 data.clearedStageIds.Add(i);

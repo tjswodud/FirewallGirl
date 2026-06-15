@@ -18,7 +18,17 @@ public class GameManager : MonoBehaviour
     {
         Instance = this;
         PlayerTurn = true;
-        // UI 의존 초기화는 모든 Awake() 완료 후 Start()에서 처리 (CardDeckController, PlayerStatusUI 등)
+        Virus.OnBossDeath += HandleBossDeathEvent;
+    }
+
+    private void OnDestroy()
+    {
+        Virus.OnBossDeath -= HandleBossDeathEvent;
+    }
+
+    private void HandleBossDeathEvent()
+    {
+        ChapterManager.instance.HandleBossClear();
     }
 
     private void Start()

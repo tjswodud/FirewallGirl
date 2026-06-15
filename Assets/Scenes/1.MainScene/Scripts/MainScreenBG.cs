@@ -29,6 +29,8 @@ public class MainScreenBG : MonoBehaviour
 
     public void LoadDeckBuildingScene()
     {
+        ChapterManager.instance.ResetToChapter1();
+        PlayerStateSaveManager.instance.Delete();
         StageSaveManager.ResetStage();
         SceneLoader.LoadDeckBuildingScene();
     }

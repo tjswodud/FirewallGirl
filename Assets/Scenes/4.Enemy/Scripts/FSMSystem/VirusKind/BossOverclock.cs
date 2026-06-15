@@ -241,7 +241,7 @@ public class BossOverclock : Virus
             {
                 Debug.Log("[BossOverclock] 소화-권한 10스택 → 플레이어 승리!");
                 CleanupEffects();
-                GameManager.Instance.GameClear();
+                InvokeOnDeathBoss();
                 return;
             }
         }
@@ -791,7 +791,7 @@ public class BossOverclock : Virus
         VirusSpawn.instance.SetDiscountVirusCount();
 
         if (VirusSpawn.instance.virusCnt <= 0)
-            GameManager.Instance.GameClear();
+            InvokeOnDeathBoss();
 
         if (enemyUIController != null) enemyUIController.panel.SetActive(false);
         Destroy(gameObject);

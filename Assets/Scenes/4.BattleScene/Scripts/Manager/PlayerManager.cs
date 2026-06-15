@@ -154,6 +154,13 @@ public class PlayerManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            if (cardPrefab == null)
+                cardPrefab = Resources.Load<GameObject>("Prefabs/NewCard");
+            if (handContainer == null)
+            {
+                CardDeckController cdc = FindObjectOfType<CardDeckController>(true);
+                if (cdc != null) handContainer = cdc.transform;
+            }
         }
         else
         {

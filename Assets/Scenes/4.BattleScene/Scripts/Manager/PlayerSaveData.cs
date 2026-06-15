@@ -11,6 +11,7 @@ public class PlayerSaveData
     public List<CardSaveData> deck = new List<CardSaveData>();
     public List<int> clearedStageIds = new List<int>();
     public int resumeStageIndex;
+    public int currentChapterId = 1;
 }
 
 [Serializable]

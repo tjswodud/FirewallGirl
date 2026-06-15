@@ -2,62 +2,78 @@ using UnityEngine;
 
 public static class StageSaveManager
 {
-    // º¸½º ½ºÅ×ÀÌÁö¸¦ ¿­±â À§ÇØ Å¬¸®¾îÇØ¾ß ÇÏ´Â ÀÏ¹İ ½ºÅ×ÀÌÁöÀÇ °³¼ö
-    // (¿¹: 1¹ø~5¹ø ½ºÅ×ÀÌÁö¸¦ ±ú¾ß ÇÑ´Ù¸é 5·Î ¼³Á¤)
-    private const int TOTAL_NORMAL_STAGES = 6;
     public static int CurrentStageIdx = 0;
 
-    // --- ÀúÀå °ü·Ã ÇÙ½É ±â´É ---
+    private static int GetTotalNormalStages()
+    {
+        ChapterData chapter = ChapterManager.instance.GetCurrentChapter();
+        return chapter != null ? chapter.normalStageCount : 6;
+    }
 
-    // ½ºÅ×ÀÌÁö Å¬¸®¾î ½Ã È£Ãâ (stageID: 1, 2, 3...)
+    // â”€â”€â”€ ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ìƒíƒœ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /// <summary>í•´ë‹¹ ìŠ¤í…Œì´ì§€ë¥¼ í´ë¦¬ì–´ ì²˜ë¦¬í•œë‹¤.</summary>
     public static void ClearStage(int stageID)
     {
-        // "Stage_1", "Stage_2" °°Àº Å°·Î 1(True)À» ÀúÀå
         if (PlayerPrefs.GetInt($"Stage_{stageID}", 0) == 0)
         {
             PlayerPrefs.SetInt($"Stage_{stageID}", 1);
-            PlayerPrefs.Save(); // ÀúÀå È®Á¤
-            Debug.Log($"½ºÅ×ÀÌÁö {stageID} Å¬¸®¾î ÀúÀå ¿Ï·á!");
+            PlayerPrefs.Save();
+            Debug.Log($"ìŠ¤í…Œì´ì§€ {stageID} í´ë¦¬ì–´ ì €ì¥ ì™„ë£Œ!");
         }
     }
 
-    // ½ºÅ×ÀÌÁö ÃÊ±âÈ­
+    /// <summary>í˜„ì¬ ì±•í„°ì˜ ëª¨ë“  ì¼ë°˜ ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ë°ì´í„°ë¥¼ ì´ˆê¸°í™”í•œë‹¤.</summary>
     public static void ResetStage()
     {
-        for (int i = 0; i < TOTAL_NORMAL_STAGES; i++)
+        int total = GetTotalNormalStages();
+        for (int i = 0; i < total; i++)
         {
             if (IsStageCleared(i))
-            {
                 PlayerPrefs.SetInt($"Stage_{i}", 0);
-            }
         }
-        PlayerPrefs.Save(); // ÀúÀå È®Á¤
-        Debug.Log($"½ºÅ×ÀÌÁö Å¬¸®¾î ÃÊ±âÈ­ ¿Ï·á!");
+        PlayerPrefs.Save();
+        Debug.Log("ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì´ˆê¸°í™” ì™„ë£Œ!");
     }
 
-    // Æ¯Á¤ ½ºÅ×ÀÌÁö¸¦ ²£´ÂÁö È®ÀÎ
+    /// <summary>íŠ¹ì • ìŠ¤í…Œì´ì§€ì˜ í´ë¦¬ì–´ ì—¬ë¶€ë¥¼ ë°˜í™˜í•œë‹¤.</summary>
     public static bool IsStageCleared(int stageID)
     {
-        // °ªÀÌ 1ÀÌ¸é ±ü °Í, 0ÀÌ¸é ¾È ±ü °Í
         return PlayerPrefs.GetInt($"Stage_{stageID}", 0) == 1;
     }
 
-    // --- º¸½º ½ºÅ×ÀÌÁö ÇØ±İ Á¶°Ç È®ÀÎ ---
-
-    // º¸½º ½ºÅ×ÀÌÁö¿¡ ÀÔÀå °¡´ÉÇÑÁö °Ë»çÇÏ´Â ÇÔ¼ö
+    /// <summary>ëª¨ë“  ì¼ë°˜ ìŠ¤í…Œì´ì§€ê°€ í´ë¦¬ì–´ë˜ì—ˆëŠ”ì§€ í™•ì¸í•œë‹¤.</summary>
     public static bool CanEnterBossStage()
     {
-        // 1¹øºÎÅÍ ¸¶Áö¸· ÀÏ¹İ ½ºÅ×ÀÌÁö±îÁö ´Ù ²£´ÂÁö È®ÀÎ
-        for (int i = 0; i < TOTAL_NORMAL_STAGES; i++)
+        int total = GetTotalNormalStages();
+        for (int i = 0; i < total; i++)
         {
-            // ÇÏ³ª¶óµµ ¾È ±ü °Ô ÀÖ´Ù¸é false ¹İÈ¯ (º¸½º Àá±è)
             if (!IsStageCleared(i))
-            {
                 return false;
-            }
         }
-
-        // ¹İº¹¹®À» ¹«»çÈ÷ Åë°úÇß´Ù¸é ¸ğµç ½ºÅ×ÀÌÁö¸¦ ±ü °Í (º¸½º ¿­¸²)
         return true;
+    }
+
+    // â”€â”€â”€ ì±•í„° ë³´ìŠ¤ ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ìƒíƒœ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    /// <summary>í•´ë‹¹ ì±•í„°ì˜ ë³´ìŠ¤ ìŠ¤í…Œì´ì§€ë¥¼ í´ë¦¬ì–´ ì²˜ë¦¬í•œë‹¤.</summary>
+    public static void ClearBossStage(int chapterId)
+    {
+        PlayerPrefs.SetInt($"Chapter_{chapterId}_Boss", 1);
+        PlayerPrefs.Save();
+        Debug.Log($"ì±•í„° {chapterId} ë³´ìŠ¤ í´ë¦¬ì–´ ì €ì¥ ì™„ë£Œ!");
+    }
+
+    /// <summary>í•´ë‹¹ ì±•í„°ì˜ ë³´ìŠ¤ ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ì—¬ë¶€ë¥¼ ë°˜í™˜í•œë‹¤.</summary>
+    public static bool IsBossStageCleared(int chapterId)
+    {
+        return PlayerPrefs.GetInt($"Chapter_{chapterId}_Boss", 0) == 1;
+    }
+
+    /// <summary>í•´ë‹¹ ì±•í„°ì˜ ë³´ìŠ¤ ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´ ë°ì´í„°ë¥¼ ì´ˆê¸°í™”í•œë‹¤.</summary>
+    public static void ResetBossStage(int chapterId)
+    {
+        PlayerPrefs.SetInt($"Chapter_{chapterId}_Boss", 0);
+        PlayerPrefs.Save();
     }
 }

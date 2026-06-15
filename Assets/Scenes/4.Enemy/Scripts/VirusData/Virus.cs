@@ -26,6 +26,15 @@ public class Virus : MonoBehaviour
 
     public State NextAction { get; protected set; }
 
+    /// <summary>보스 처치/챕터 클리어 조건 달성 시 발행. GameManager가 구독하여 챕터 전환을 시작한다.</summary>
+    public static event System.Action OnBossDeath;
+
+    /// <summary>보스 서브클래스의 OnDeath()에서 호출. OnBossDeath 이벤트를 발행한다.</summary>
+    protected void InvokeOnDeathBoss()
+    {
+        OnBossDeath?.Invoke();
+    }
+
     private Coroutine _actionCo;
     protected Vector3 _originPos;
     private Vector3 _originScale;

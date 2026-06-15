@@ -697,7 +697,7 @@ public class BossNull : Virus
         VirusSpawn.instance.SetDiscountVirusCount();
 
         if (VirusSpawn.instance.virusCnt <= 0)
-            GameManager.Instance.GameClear();
+            InvokeOnDeathBoss();
 
         if (enemyUIController != null) enemyUIController.panel.SetActive(false);
         Destroy(gameObject);
