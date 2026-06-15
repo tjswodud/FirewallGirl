@@ -131,6 +131,11 @@ public class BossUnrendered : Virus
     [SerializeField] private Canvas _battleUICanvas;
     private PixelateEffect _collapseScreenEffect;
 
+    // ─── 화면 뒤집기 대상 ────────────────────────────────────────
+    // CanvasScaler가 Canvas의 localScale을 매 프레임 덮어쓰기 때문에
+    // Canvas 자체가 아닌 런타임에 생성한 FlipRoot 자식을 뒤집는다.
+    [SerializeField] private Transform _flipRoot;
+
     // ─── 그래픽-블루스크린 ───────────────────────────────────────
     private BluescreenPanel _bluescreenUI;
     private bool _pendingBluescreen = false;
@@ -226,10 +231,34 @@ public class BossUnrendered : Virus
             _collapseScreenEffect = _battleUICanvas.GetComponent<PixelateEffect>();
             if (_collapseScreenEffect == null)
                 _collapseScreenEffect = _battleUICanvas.gameObject.AddComponent<PixelateEffect>();
+
+            // FlipRoot 자동 생성: Inspector 미할당 시 런타임에 생성
+            // CanvasScaler가 Canvas.localScale을 매 프레임 덮어쓰므로
+            // Canvas 자식 컨테이너를 별도로 만들어 그것만 뒤집는다.
+            if (_flipRoot == null)
+            {
+                GameObject flipRootGO = new GameObject("FlipRoot");
+                RectTransform flipRT = flipRootGO.AddComponent<RectTransform>();
+                flipRT.SetParent(_battleUICanvas.transform, false);
+                flipRT.anchorMin = Vector2.zero;
+                flipRT.anchorMax = Vector2.one;
+                flipRT.offsetMin = Vector2.zero;
+                flipRT.offsetMax = Vector2.zero;
+
+                // 기존 Canvas 자식을 모두 FlipRoot 아래로 이동 (FlipRoot 자신 제외)
+                List<Transform> existingChildren = new List<Transform>();
+                foreach (Transform child in _battleUICanvas.transform)
+                    if (child != flipRT) existingChildren.Add(child);
+                foreach (Transform child in existingChildren)
+                    child.SetParent(flipRT, false);
+
+                _flipRoot = flipRT;
+                Debug.Log("[BossUnrendered] FlipRoot 자동 생성 완료");
+            }
         }
         else
         {
-            Debug.LogWarning("[BossUnrendered] _battleUICanvas를 찾을 수 없습니다. 붕괴 모자이크 비활성.");
+            Debug.LogWarning("[BossUnrendered] _battleUICanvas를 찾을 수 없습니다. 붕괴 모자이크/화면 뒤집기 비활성.");
         }
 
         if (spawnNum != 3)
@@ -1591,11 +1620,11 @@ public class BossUnrendered : Virus
         }
     }
 
-    /// <summary>3페이즈 패시브: Canvas Y 스케일을 반전/복원해 화면 위아래를 뒤집는다.</summary>
+    /// <summary>3페이즈 패시브: FlipRoot Y 스케일을 반전/복원해 화면 위아래를 뒤집는다.</summary>
     private void ApplySepFlip(bool flip)
     {
-        if (_battleUICanvas == null) return;
-        _battleUICanvas.transform.localScale = flip
+        if (_flipRoot == null) return;
+        _flipRoot.localScale = flip
             ? new Vector3(1f, -1f, 1f)
             : Vector3.one;
     }
