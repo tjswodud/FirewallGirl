@@ -4316,7 +4316,7 @@ MonoBehaviour:
   currentHP: 100
   currentCost: 5
   totalCost: 5
-  attackPower: 100
+  attackPower: 5
   defensePower: 5
   activeModifiers: []
   cannotGainDefenseTurns: 0
@@ -4333,6 +4333,7 @@ MonoBehaviour:
   defenseMultiplier: 1
   isDefenseRetained: 0
   pendingFlashCards: []
+  pendingFakeCardCount: 0
   hpBar: {fileID: 373234982}
   powerUI: {fileID: 854836676}
   costUI: {fileID: 854836675}

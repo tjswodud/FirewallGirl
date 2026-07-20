@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2e223d516d3e7d4ba86a8783867daa6, type: 3}
+  m_Name: PAT_002
+  m_EditorClassIdentifier: 
+  cardIndex: 9
+  cardName: "\uC784\uC2DC \uCE90\uC2DC \uD655\uC7A5"
+  cardNameEng: TEMPORARY CACHE EXTENSION
+  cardImage: {fileID: 0}
+  positiveStatType: 3
+  negativeStatType: 1
+  cardType: 2
+  positiveStatValue: 4
+  negativeStatValue: -1
+  cost: 1
+  coolTime: 0
+  summaryDescription: "\uCCB4\uB825 <color=#E24E3A>{0}</color> / \uBC29\uC5B4\uB825
+    <color=#4152E5>{1}</color>"
+  description: "\uC5EC\uC720 \uBA54\uBAA8\uB9AC\uB97C \uD655\uBCF4\uD558\uC5EC \uC190\uC0C1\uC744
+    \uBC84\uD2F4\uB2E4."

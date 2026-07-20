@@ -10,8 +10,23 @@ public enum CardViewState { Mini, Hover, Detailed }
 
 public class PlayerCard : MonoBehaviour
 {
-    public CardObject cardData;
-    
+    private CardObject _cardData;
+    public CardObject cardData
+    {
+        get => _cardData;
+        set
+        {
+            _cardData = value;
+            ApplyAttributeVisual();
+        }
+    }
+
+    private Image contentImage;
+
+    private static Sprite patchIllust;
+    private static Sprite rootIllust;
+    private static bool illustLoaded = false;
+
     [SerializeField]
     private int costValue;
 
@@ -78,6 +93,43 @@ public class PlayerCard : MonoBehaviour
             return null;
         }
         return StatIconManager.Instance.GetIcon(stat);
+    }
+
+    private void Awake()
+    {
+        Transform illustrationRoot = transform.Find("Card");
+        if (illustrationRoot == null) illustrationRoot = transform;
+
+        Transform contentTransform = illustrationRoot.Find("Content");
+        if (contentTransform != null) contentImage = contentTransform.GetComponent<Image>();
+
+        EnsureIllustLoaded();
+    }
+
+    private static void EnsureIllustLoaded()
+    {
+        if (illustLoaded) return;
+        patchIllust = Resources.Load<Sprite>("CardIllustrations/Patch");
+        rootIllust = Resources.Load<Sprite>("CardIllustrations/Root");
+        illustLoaded = true;
+    }
+
+    private void ApplyAttributeVisual()
+    {
+        if (_cardData == null || contentImage == null) return;
+
+        Sprite illust = GetCardTypeIllust(_cardData.cardType);
+        if (illust != null) contentImage.sprite = illust;
+    }
+
+    private Sprite GetCardTypeIllust(CardType type)
+    {
+        switch (type)
+        {
+            case CardType.Patch: return patchIllust;
+            case CardType.Root: return rootIllust;
+            default: return null; // Vaccine/None: 프리팹에 기본으로 지정된 일러스트 유지
+        }
     }
 
     private void Start()

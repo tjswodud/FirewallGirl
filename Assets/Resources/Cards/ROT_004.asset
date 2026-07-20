@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2e223d516d3e7d4ba86a8783867daa6, type: 3}
+  m_Name: ROT_004
+  m_EditorClassIdentifier: 
+  cardIndex: 18
+  cardName: "\uC81C\uB85C \uB370\uC774"
+  cardNameEng: ZERO DAY
+  cardImage: {fileID: 0}
+  positiveStatType: 0
+  negativeStatType: 3
+  cardType: 3
+  positiveStatValue: 9
+  negativeStatValue: -16
+  cost: 3
+  coolTime: 0
+  summaryDescription: "\uACF5\uACA9\uB825 <color=#E24E3A>{0}</color> / \uCCB4\uB825
+    <color=#4152E5>{1}</color>"
+  description: "\uC54C\uB824\uC9C0\uC9C0 \uC54A\uC740 \uCDE8\uC57D\uC810\uC744 \uC2E4\uD589\uD558\uC5EC
+    \uBC14\uC774\uB7EC\uC2A4\uB97C \uC12C\uBA78\uD55C\uB2E4."
