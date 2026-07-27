@@ -142,7 +142,9 @@ public class PlayerCard : MonoBehaviour
     {
         playerManager = FindObjectOfType<PlayerManager>();
 
-        costValue = cardData.cost;
+        costValue = PlayerManager.instance != null
+            ? PlayerManager.instance.GetEffectiveCardCost(cardData.cost)
+            : cardData.cost;
         positiveStatValue = cardData.positiveStatValue;
         negativeStatValue = cardData.negativeStatValue;
 

@@ -68,7 +68,8 @@ public class PlayerManager : MonoBehaviour
     // [추가] 다중 턴 상태이상 리스트 & 방어도 획득 불가 턴 카운터
     public List<StatModifier> activeModifiers = new List<StatModifier>();
     public int cannotGainDefenseTurns = 0;
-    
+    public bool nextEnemyTurnDamageImmune = false; // 활성화 시 다음 적 턴 동안 받는 모든 공격 피해를 무효화 (무적의 방화벽 등)
+
     // 플레이어가 현재 보유 중인 증강체 리스트
     public List<AugmentBase> activeAugments = new List<AugmentBase>();
 
@@ -97,6 +98,8 @@ public class PlayerManager : MonoBehaviour
     public List<CardObject> pendingFlashCards = new List<CardObject>(); // 다음 플레이어 턴 지급 예정 임시 카드
     public int pendingFakeCardCount = 0; // 다음 플레이어 턴에 추가할 페이크 카드 수
     public int pendingNextTurnCostPenalty = 0; // 다음 플레이어 턴에만 적용할 예약된 최대 코스트 변동량 (오버클럭 등)
+    public int pendingNextTurnCostDiscountPerCard = 0; // 다음 플레이어 턴에만 적용할 예약된 카드별 코스트 할인량 (비용 절감 등)
+    public int activeCardCostDiscount = 0; // 이번 플레이어 턴에 실제 적용 중인 카드별 코스트 할인량
 
     // ─── 효과 레지스트리 ───────────────────────────────────────
     private readonly List<ActiveEffect> _registeredEffects = new List<ActiveEffect>();
@@ -464,6 +467,7 @@ public class PlayerManager : MonoBehaviour
         cannotGainDefenseTurns = 0;
         lagDebuffTurns         = 0;
         currentDotDamage       = 0;
+        nextEnemyTurnDamageImmune = false;
         reducedDrawCount       = 0;
         bonusDrawCount         = 0;
         heatStacks             = 0;
@@ -561,6 +565,7 @@ public class PlayerManager : MonoBehaviour
         cannotGainDefenseTurns = 0;
         lagDebuffTurns         = 0;
         currentDotDamage       = 0;
+        nextEnemyTurnDamageImmune = false;
 
         UpdateUI();
     }
@@ -612,6 +617,18 @@ public class PlayerManager : MonoBehaviour
         pendingNextTurnCostPenalty += amount;
     }
 
+    // 다음 플레이어 턴에만 적용되는 카드별 코스트 할인을 예약한다. PreparePlayerTurn()에서 소비된다.
+    public void AddPendingNextTurnCostDiscount(int amount)
+    {
+        pendingNextTurnCostDiscountPerCard += amount;
+    }
+
+    // 이번 턴 활성화된 카드별 코스트 할인을 반영한 실제 코스트를 계산한다.
+    public int GetEffectiveCardCost(int baseCost)
+    {
+        return Mathf.Max(0, baseCost - activeCardCostDiscount);
+    }
+
     // [추가] 턴 종료/시작 시 호출하여 디버프 지속 시간을 깎습니다.
     public void OnTurnEndProcess()
     {
@@ -626,6 +643,12 @@ public class PlayerManager : MonoBehaviour
 
         // 이번 턴 적용된 드로우 감소 초기화 (플레이어 턴 종료 시)
         appliedDrawReduction = 0;
+
+        // 비용 절감 등으로 부여된 카드별 코스트 할인은 해당 턴이 끝나면 원상복구
+        activeCardCostDiscount = 0;
+
+        // 무적의 방화벽 등으로 부여된 피해 무효화는 적 턴 공격이 모두 끝나면 해제
+        nextEnemyTurnDamageImmune = false;
 
         // 역순으로 순회하며 기간이 다 된 디버프 제거
         for (int i = activeModifiers.Count - 1; i >= 0; i--)
@@ -751,8 +774,20 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    // 카드 사용 즉시 무적 상태를 활성화한다. 곧이어 벌어지는 다음 적 턴의 공격 전체를 무효화하며, OnTurnEndProcess()에서 자동 해제된다.
+    public void ActivateNextEnemyTurnDamageImmunity()
+    {
+        nextEnemyTurnDamageImmune = true;
+    }
+
     public void TakeDamage(int damage)
     {
+        if (nextEnemyTurnDamageImmune)
+        {
+            Debug.Log("[PlayerManager] 무적의 방화벽: 공격 피해 무효화");
+            return;
+        }
+
         // int finalDamage = Mathf.Max(0, damage - DefensePower);
         // currentHP = Mathf.Max(0, currentHP - finalDamage);
         //
@@ -867,6 +902,13 @@ public class PlayerManager : MonoBehaviour
         {
             AddMultiTurnStat(StatType.Cost, pendingNextTurnCostPenalty, 1, "오버클럭: 이번 턴 최대 코스트 감소");
             pendingNextTurnCostPenalty = 0;
+        }
+
+        // 카드 효과로 예약된 다음 턴 한정 카드별 코스트 할인 적용 (예: 비용 절감)
+        if (pendingNextTurnCostDiscountPerCard != 0)
+        {
+            activeCardCostDiscount = pendingNextTurnCostDiscountPerCard;
+            pendingNextTurnCostDiscountPerCard = 0;
         }
 
         DrawCards(drawCount);
@@ -984,6 +1026,14 @@ public class PlayerManager : MonoBehaviour
         {
             CardDeckController.instance.RefreshHandLayout(handCards);
         }
+    }
+
+    // 손에 있는 카드를 모두 버리고 drawPile을 섞은 뒤 지정된 수만큼 새로 뽑는다. (긴급 정리 등 즉시발동 카드용)
+    public void DiscardHandAndRedraw(int count)
+    {
+        ClearHand();
+        Shuffle(drawPile);
+        DrawCards(count);
     }
 
     // 보스 발악 페이즈 전용: 임시 카드를 손에 직접 추가 (덱에 들어가지 않음)
@@ -1211,6 +1261,7 @@ public class PlayerManager : MonoBehaviour
         cannotGainDefenseTurns = 0;
         lagDebuffTurns         = 0;
         currentDotDamage       = 0;
+        nextEnemyTurnDamageImmune = false;
 
         masterDeck.Clear();
         drawPile.Clear();
