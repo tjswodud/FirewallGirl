@@ -81,9 +81,8 @@ public class EnemyTurnManager : MonoBehaviour
         _running = false;
         
         PlayerManager.instance.OnTurnEndProcess(); // 디버프 틱/쿨타임 갱신
-        PlayerManager.instance.PreparePlayerTurn();
+        PlayerManager.instance.PreparePlayerTurn(); // 코스트 리필 포함
         PlayerManager.instance.ResetTurnDeltaStats();
-        PlayerManager.instance.currentCost = PlayerManager.instance.TotalCost;
         PlayerManager.instance.UpdateUI();
 
         // 플레이어 턴 시작 이벤트 발행 (보스 패시브 등 구독자에게 알림)

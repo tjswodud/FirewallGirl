@@ -913,6 +913,9 @@ public class PlayerManager : MonoBehaviour
 
         DrawCards(drawCount);
 
+        // 턴 시작 시 코스트를 최대치로 리필 (전멸 승리로 적 턴을 거치지 않고 다음 전투가 시작되는 경우 포함)
+        currentCost = TotalCost;
+
         UpdateUI();
         OnHandRefreshed?.Invoke();
     }

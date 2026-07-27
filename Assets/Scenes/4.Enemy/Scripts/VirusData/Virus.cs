@@ -317,6 +317,24 @@ public class Virus : MonoBehaviour
 
         return remaining;
     }
+
+    // 방어력을 무시하고 체력만 직접 감소시키는 고정 피해 (바이러스 박멸 등)
+    public virtual void ApplyTrueDamage(int damage)
+    {
+        if (virusData.CurHpCnt > 0)
+        {
+            virusData.CurHpCnt = Mathf.Max(0, virusData.CurHpCnt - damage);
+        }
+
+        UpdateData();
+
+        Debug.Log($"[Enemy] 방어 무시 피해: {damage}, 현재 체력: {virusData.CurHpCnt}");
+
+        if (virusData.CurHpCnt <= 0)
+        {
+            OnDeath();
+        }
+    }
     // ���� ó���� ����ϴ� �Լ� �߰�
     protected virtual void OnDeath()
     {
