@@ -688,7 +688,7 @@ public class PlayerManager : MonoBehaviour
                 }
                 else
                 {
-                    currentHP = Mathf.Max(0, currentHP + value);
+                    currentHP = Mathf.Max(1, currentHP + value);
                 }
                 break;
 
