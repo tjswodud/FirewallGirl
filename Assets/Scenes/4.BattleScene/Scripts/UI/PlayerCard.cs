@@ -23,8 +23,10 @@ public class PlayerCard : MonoBehaviour
 
     private Image contentImage;
 
+    private static Sprite vaccineIllust;
     private static Sprite patchIllust;
     private static Sprite rootIllust;
+    private static Sprite specialIllust;
     private static bool illustLoaded = false;
 
     [SerializeField]
@@ -109,8 +111,10 @@ public class PlayerCard : MonoBehaviour
     private static void EnsureIllustLoaded()
     {
         if (illustLoaded) return;
+        vaccineIllust = Resources.Load<Sprite>("CardIllustrations/Vaccine");
         patchIllust = Resources.Load<Sprite>("CardIllustrations/Patch");
         rootIllust = Resources.Load<Sprite>("CardIllustrations/Root");
+        specialIllust = Resources.Load<Sprite>("CardIllustrations/Special");
         illustLoaded = true;
     }
 
@@ -126,9 +130,11 @@ public class PlayerCard : MonoBehaviour
     {
         switch (type)
         {
+            case CardType.Vaccine: return vaccineIllust;
             case CardType.Patch: return patchIllust;
             case CardType.Root: return rootIllust;
-            default: return null; // Vaccine/None: 프리팹에 기본으로 지정된 일러스트 유지
+            case CardType.Special: return specialIllust;
+            default: return null; // 프리팹에 기본으로 지정된 일러스트 유지
         }
     }
 
@@ -184,7 +190,16 @@ public class PlayerCard : MonoBehaviour
     public void TogglePreviewState()
     {
         if (PlayerManager.instance == null) return;
-        
+
+        // 즉시발동 특수 효과 카드는 대기열을 거치지 않고 버튼 클릭 즉시 효과를 적용한다.
+        if (cardData is ISpecialCardEffect specialEffect)
+        {
+            OnUseClicked?.Invoke();
+            PlayerManager.instance.UseInstantCard(this, specialEffect);
+            HideDetailView();
+            return;
+        }
+
         if (!IsInPreview) OnUseClicked?.Invoke();
         
         // �Ŵ����� ��ٱ��Ͽ� �ְų� ��

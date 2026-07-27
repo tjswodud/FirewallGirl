@@ -96,6 +96,7 @@ public class PlayerManager : MonoBehaviour
     [Header("Pending Flash Cards")]
     public List<CardObject> pendingFlashCards = new List<CardObject>(); // 다음 플레이어 턴 지급 예정 임시 카드
     public int pendingFakeCardCount = 0; // 다음 플레이어 턴에 추가할 페이크 카드 수
+    public int pendingNextTurnCostPenalty = 0; // 다음 플레이어 턴에만 적용할 예약된 최대 코스트 변동량 (오버클럭 등)
 
     // ─── 효과 레지스트리 ───────────────────────────────────────
     private readonly List<ActiveEffect> _registeredEffects = new List<ActiveEffect>();
@@ -228,6 +229,22 @@ public class PlayerManager : MonoBehaviour
         UpdateSequenceSummaryUI();
     }
     
+    // 즉시발동 특수 카드 처리: 대기열(sequenceQueue)을 거치지 않고 버튼 클릭 즉시 효과를 적용한다.
+    public void UseInstantCard(PlayerCard card, ISpecialCardEffect effect)
+    {
+        if (card == null || card.cardData == null || effect == null) return;
+        if (card.currentCoolTime > 0) return;
+        if (currentCost < card.cost) return;
+
+        currentCost -= card.cost;
+        effect.ApplyEffect(this);
+
+        card.currentCoolTime = card.cardData.coolTime;
+        RecordCardUsed(card.cardData.cardType);
+        OnCardUsed(card);
+        UpdateUI();
+    }
+
     // 각 카드의 배율을 계산하여 반환
     private Dictionary<PlayerCard, float> GetCardMultipliers()
     {
@@ -589,6 +606,12 @@ public class PlayerManager : MonoBehaviour
         UpdateUI();
     }
 
+    // 다음 플레이어 턴에만 적용되는 코스트 변동을 예약한다. PreparePlayerTurn()에서 소비된다.
+    public void AddPendingNextTurnCostModifier(int amount)
+    {
+        pendingNextTurnCostPenalty += amount;
+    }
+
     // [추가] 턴 종료/시작 시 호출하여 디버프 지속 시간을 깎습니다.
     public void OnTurnEndProcess()
     {
@@ -838,6 +861,13 @@ public class PlayerManager : MonoBehaviour
         for (int i = 0; i < pendingFakeCardCount; i++)
             DrawFakeCard();
         pendingFakeCardCount = 0;
+
+        // 카드 효과로 예약된 다음 턴 한정 코스트 변동 적용 (예: 오버클럭)
+        if (pendingNextTurnCostPenalty != 0)
+        {
+            AddMultiTurnStat(StatType.Cost, pendingNextTurnCostPenalty, 1, "오버클럭: 이번 턴 최대 코스트 감소");
+            pendingNextTurnCostPenalty = 0;
+        }
 
         DrawCards(drawCount);
 

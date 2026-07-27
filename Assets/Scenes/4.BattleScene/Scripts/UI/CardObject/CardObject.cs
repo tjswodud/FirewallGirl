@@ -7,7 +7,8 @@ public enum CardType
     None,
     Vaccine,
     Patch,
-    Root
+    Root,
+    Special
 }
 
 [CreateAssetMenu(fileName = "CardData", menuName = "Create Card Data/CardData", order = int.MaxValue)]

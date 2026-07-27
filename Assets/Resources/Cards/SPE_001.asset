@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5527bdc0fb1c942875741376e2a407, type: 3}
+  m_Name: SPE_001
+  m_EditorClassIdentifier: 
+  cardIndex: 19
+  cardName: "\uC624\uBC84\uD074\uB7ED"
+  cardNameEng: OVERCLOCK
+  cardImage: {fileID: 0}
+  positiveStatType: 0
+  negativeStatType: 0
+  cardType: 4
+  positiveStatValue: 0
+  negativeStatValue: 0
+  cost: 0
+  coolTime: 0
+  summaryDescription: "\uD574\uB2F9 \uD134 \uCF54\uC2A4\uD2B8 +2, \uB2E4\uC74C \uD134
+    \uC804\uCCB4 \uCF54\uC2A4\uD2B8 -3"
+  description: "\uD55C\uACC4\uB97C \uB118\uAE34 \uC131\uB2A5\uC5D0\uB294 \uBC18\uB4DC\uC2DC
+    \uB300\uAC00\uAC00 \uB530\uB978\uB2E4."
+  thisTurnCostBonus: 2
+  nextTurnMaxCostPenalty: 3
