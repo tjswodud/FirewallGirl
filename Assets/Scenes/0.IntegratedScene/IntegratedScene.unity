@@ -3051,6 +3051,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 843590749}
   m_CullTransparentMesh: 1
+--- !u!1 &852695339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 852695341}
+  - component: {fileID: 852695340}
+  m_Layer: 0
+  m_Name: CardTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &852695340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852695339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 703d8ff8cb714df282d81d41eb255462, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &852695341
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852695339}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 675.74915, y: 484.89166, z: -20.996561}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &854836675 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2963882148795292291, guid: db2b80a1d11b0d04985c7bebaabb3900, type: 3}
@@ -4320,6 +4364,7 @@ MonoBehaviour:
   defensePower: 5
   activeModifiers: []
   cannotGainDefenseTurns: 0
+  nextEnemyTurnDamageImmune: 0
   activeAugments: []
   turnVaccineCount: 0
   turnPatchCount: 0
@@ -4334,6 +4379,9 @@ MonoBehaviour:
   isDefenseRetained: 0
   pendingFlashCards: []
   pendingFakeCardCount: 0
+  pendingNextTurnCostPenalty: 0
+  pendingNextTurnCostDiscountPerCard: 0
+  activeCardCostDiscount: 0
   hpBar: {fileID: 373234982}
   powerUI: {fileID: 854836676}
   costUI: {fileID: 854836675}
@@ -7388,3 +7436,4 @@ SceneRoots:
   - {fileID: 1096089808}
   - {fileID: 488499716}
   - {fileID: 1686374163}
+  - {fileID: 852695341}

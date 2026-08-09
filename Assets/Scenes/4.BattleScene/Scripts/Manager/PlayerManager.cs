@@ -108,6 +108,32 @@ public class PlayerManager : MonoBehaviour
     public void RegisterEffect(ActiveEffect effect) => _registeredEffects.Add(effect);
     public void UnregisterEffect(ActiveEffect effect) => _registeredEffects.Remove(effect);
 
+    // PlayerManager 외부(보스 스크립트 등)에 등록된 조건부 디버프가
+    // 강제 재부팅 등으로 정리되었을 때 자체적으로 구독을 해제할 수 있도록 알리는 이벤트
+    public event System.Action OnStatusEffectsCleared;
+
+    /// <summary>
+    /// 아군에게 적용된 모든 버프/디버프를 제거한다 (강제 재부팅 카드 등에서 사용).
+    /// PlayerStatusUI에 표시되는 상태(activeModifiers, cannotGainDefenseTurns,
+    /// lagDebuffTurns, currentDotDamage, 등록된 보스 효과)를 모두 정리한다.
+    /// </summary>
+    public void ClearAllStatusEffects()
+    {
+        int costBefore = TotalCost;
+
+        activeModifiers.Clear();
+        cannotGainDefenseTurns = 0;
+        lagDebuffTurns = 0;
+        currentDotDamage = 0;
+        _registeredEffects.Clear();
+
+        // Cost 디버프 해제로 늘어난 최대치만큼 현재 코스트도 함께 복원
+        int costAfter = TotalCost;
+        currentCost = Mathf.Clamp(currentCost + (costAfter - costBefore), 0, costAfter);
+
+        OnStatusEffectsCleared?.Invoke();
+    }
+
     public void RecordCardUsed(CardType type)
     {
         turnTotalCardCount++;

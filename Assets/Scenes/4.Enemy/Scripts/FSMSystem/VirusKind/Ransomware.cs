@@ -53,6 +53,8 @@ public class Ransomware : Virus
         PlayerManager.instance.UpdateUI();
 
         System.Action handler = null;
+        System.Action cleanseHandler = null;
+
         handler = () =>
         {
             int costSpent = PlayerManager.instance.TotalCost - PlayerManager.instance.currentCost;
@@ -74,9 +76,21 @@ public class Ransomware : Virus
             PlayerManager.instance.UnregisterEffect(effect);
             PlayerManager.instance.UpdateUI();
             EnemyTurnManager.OnPlayerTurnEnded -= handler;
+            PlayerManager.instance.OnStatusEffectsCleared -= cleanseHandler;
+        };
+
+        // 강제 재부팅 등으로 상태 효과가 일괄 정리되면, 이 디버프의 피해 판정도 함께 취소한다.
+        cleanseHandler = () =>
+        {
+            isDebuffActive = false;
+            PlayerManager.instance.UnregisterEffect(effect);
+            PlayerManager.instance.UpdateUI();
+            EnemyTurnManager.OnPlayerTurnEnded -= handler;
+            PlayerManager.instance.OnStatusEffectsCleared -= cleanseHandler;
         };
 
         EnemyTurnManager.OnPlayerTurnEnded += handler;
+        PlayerManager.instance.OnStatusEffectsCleared += cleanseHandler;
 
         yield return new WaitForSeconds(0.5f);
     }

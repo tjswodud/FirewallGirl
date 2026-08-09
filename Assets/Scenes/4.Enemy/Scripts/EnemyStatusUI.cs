@@ -42,6 +42,16 @@ public class EnemyStatusUI : MonoBehaviour
     public void RegisterEffect(ActiveEffect effect)   => _registeredEffects.Add(effect);
     public void UnregisterEffect(ActiveEffect effect) => _registeredEffects.Remove(effect);
 
+    /// <summary>
+    /// 등록된 모든 상태 효과를 제거하고 아이콘을 숨긴다 (강제 재부팅 카드 등에서 사용).
+    /// 보스 내부 상태 플래그 자체는 되돌리지 않고 UI 표시만 정리한다.
+    /// </summary>
+    public void ClearAllEffects()
+    {
+        _registeredEffects.Clear();
+        RefreshStatusUI();
+    }
+
     // ─── UI 갱신 (UpdateData 등에서 호출) ───────────────────
 
     public void RefreshStatusUI()
